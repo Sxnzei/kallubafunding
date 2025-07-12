@@ -1,0 +1,36 @@
+You are building Kalluba’s authentication feature in an existing React + Express monorepo.  We’re not deploying on Replit; just output the files so I can export and continue locally.
+
+1. Update Prisma Schema
+   - Add model User (id, name, email, passwordHash, avatarUrl?, bio?, role, createdAt, updatedAt).
+   - Generate and run migration.
+
+2. Backend (Express + Prisma + JWT)
+   - Create `/backend/src/routes/auth.routes.js` exporting POST `/api/auth/register` and POST `/api/auth/login`.
+   - Create `/backend/src/controllers/auth.controller.js`:
+     • `register(req,res)`: validate name/email/password, hash password with bcrypt, create user in DB, return { token, user }.
+     • `login(req,res)`: validate email/password, compare hash, sign JWT with user id, return { token, user }.
+   - Add middleware `/backend/src/middleware/auth.js`: verify JWT from `Authorization: Bearer`, attach `req.user`.
+   - Wire routes in `/backend/src/index.js`.
+
+3. Frontend (React + Tailwind + React-Router + Axios)
+   - Under `/frontend/src/pages/Signup.jsx`:
+     • Form fields: name, email, password, confirm password.
+     • Use React Hook Form + Yup for validation.
+     • On submit, POST to `/api/auth/register`, save token to `localStorage`, redirect to dashboard.
+   - Under `/frontend/src/pages/Login.jsx`:
+     • Fields: email, password.
+     • On submit, POST to `/api/auth/login`, save token, redirect.
+   - Create `/frontend/src/context/AuthContext.jsx`:
+     • Provide `user`, `token`, `login()`, `logout()`.
+     • On mount, read token from `localStorage`, fetch `/api/users/me` to populate `user`.
+   - Protect routes: wrap private pages in `<RequireAuth>` that redirects to `/login` if no token.
+   - Update Navbar component to show “Log In”/“Sign Up” when logged out, user avatar + “Logout” when logged in.
+
+4. Environment Variables
+   - `.env` in `/backend`: `JWT_SECRET=your_secret_here`, `DATABASE_URL=…`.
+   - `.env.local` in `/frontend`: `VITE_API_URL=http://localhost:4000`.
+
+5. Seed Script
+   - In `/backend/prisma/seed.ts`, hash a default user password and create an admin user.
+
+Please output each file in full, with path header comments. Omit deployment configs. Start with the updated `schema.prisma`, then backend files, then frontend files, in the order above.
